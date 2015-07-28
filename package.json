@@ -2,7 +2,7 @@
   "name": "data-shaper",
   "version": "1.0.0",
   "description": "Utility for building meaningful response shapes from normalized, related data",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "gulp test"
   },
@@ -20,5 +20,17 @@
   "bugs": {
     "url": "https://github.com/vgno/data-shaper/issues"
   },
-  "homepage": "https://github.com/vgno/data-shaper#readme"
+  "homepage": "https://github.com/vgno/data-shaper#readme",
+  "devDependencies": {
+    "eslint-config-vgno": "^1.0.1",
+    "gulp": "^3.9.0",
+    "gulp-eslint": "^0.15.0",
+    "gulp-istanbul": "^0.10.0",
+    "gulp-mocha": "^2.1.3",
+    "mocha": "^2.2.5"
+  },
+  "dependencies": {
+    "async": "^1.4.0",
+    "lodash.merge": "^3.3.2"
+  }
 }
