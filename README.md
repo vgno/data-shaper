@@ -18,7 +18,7 @@ References to values on the passed objects themselves is written as a simple str
 If have a field `companyId` on the object and want to get the name of the company you can use `companyId.name` given that name is a property on the company data object.
 
 ## Fetching data
-In order fo the data shaper to be able to resolve data you need to name your foreign keys in a way so that you're able to know what to query. The resolver pass the id and reference to the `fetchData` function you provide to the data-shaper. You will then have to use the reference to determine what collection or table to fetch and return the correct data.
+In order for the data shaper to be able to resolve data you need to name your foreign keys in a way so that you're able to know what to query. The resolver pass the id and reference to the `fetchData` function you provide to the data-shaper. You will then have to use the reference to determine what collection or table to fetch and return the correct data.
 
 Your fetchData function may look like this
 ```js
