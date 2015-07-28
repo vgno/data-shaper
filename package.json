@@ -1,0 +1,24 @@
+{
+  "name": "data-shaper",
+  "version": "1.0.0",
+  "description": "Utility for building meaningful response shapes from normalized, related data",
+  "main": "index.js",
+  "scripts": {
+    "test": "gulp test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/vgno/data-shaper.git"
+  },
+  "keywords": [
+    "resolving",
+    "relations",
+    "shape"
+  ],
+  "author": "Kristoffer Brabrand <kristoffer@brabrand.no>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vgno/data-shaper/issues"
+  },
+  "homepage": "https://github.com/vgno/data-shaper#readme"
+}
