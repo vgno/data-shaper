@@ -81,4 +81,4 @@ function dataShaper(data, shape, options, callback) {
     });
 }
 
-module.exports = responseShaper;
+module.exports = dataShaper;
