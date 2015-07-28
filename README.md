@@ -1,4 +1,7 @@
 # Data shaper
+
+[![Build Status](http://img.shields.io/travis/vgno/data-shaper/master.svg?style=flat-square)](https://travis-ci.org/vgno/data-shaper)
+
 The data shaper is a utility for shaping data and resolving related objects and data from normalized, relational data. Through shapes the relation between different parts of the response is declared, and a flat, keyed response is created based on the response objects and collections you've declared.
 
 ### Why?
@@ -10,7 +13,7 @@ Through the declaration of shapes and references to related data you have a fair
 --------------------
 
 ## References
-References to values on the passed objects themselves is written as a simple string. Values referencing properties on related data use dot notation. 
+References to values on the passed objects themselves is written as a simple string. Values referencing properties on related data use dot notation.
 
 If have a field `companyId` on the object and want to get the name of the company you can use `companyId.name` given that name is a property on the company data object.
 
@@ -23,7 +26,7 @@ var db = require('your-database-adapter');
 
 function fetchData(id, reference, callback) {
     var tableName = reference.replace(/Id$/, '');
-    
+
     db(tableName).fetch(id, callback);
 }
 ```
