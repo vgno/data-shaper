@@ -26,6 +26,20 @@ function fetchData(id, reference, callback) {
     });
 }
 
+var companyShape = {
+    id: 'id',
+    name: 'name'
+};
+
+var personShape = {
+    id: 'id',
+    name: 'name',
+    company: {
+        reference: 'companyId',
+        shape: companyShape
+    }
+};
+
 dataShaper(
     { id: 1, name: 'Kristoffer', companyId: 2 }, // data to shape
     personShape, // the shape to use
