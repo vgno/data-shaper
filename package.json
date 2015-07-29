@@ -1,6 +1,6 @@
 {
   "name": "data-shaper",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Utility for building meaningful data shapes from normalized, related data",
   "main": "src/index.js",
   "scripts": {
