@@ -5,7 +5,7 @@
 The data shaper is a utility for shaping data and resolving related objects and data from normalized, relational data. Through shapes the relation between different parts of the response is declared, and a flat, keyed response is created based on the response objects and collections you've declared.
 
 ### Why?
-While normalized datastructures usually is a good idea it does not always translate so good to what you want to present to a client side app or a 3rd party consumer. The problem is in many cases solved creating lots of custom, which is not trivial to maintain.
+While normalized datastructures usually is a good idea it does not always translate so good to what you want to present to a client side app or a 3rd party consumer. The problem is in many cases solved creating lots of custom endpoints, which is not trivial to maintain.
 
 ### How?
 Through the declaration of shapes and references to related data you have a fairly flexible and very maintainable way of building responses spanning across multiple collections of data.
