@@ -78,7 +78,8 @@ var personShape = {
             shape: employerShape
         }
     }
-};```
+};
+```
 
 When shaping a person object using the `personShape` the `fetchData` method you provide is used to resolve the data for the company. In the `personShape` company is declared using an object with a reference and a shape – a `fragment`.
 
