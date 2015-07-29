@@ -44,4 +44,12 @@ describe('Resolve value', function() {
             }
         );
     });
+
+    it('returns null if null is passed as data', function(done) {
+        resolveValue(null, 'foobar', {}, function(err, res) {
+            assert(!err);
+            assert.equal(res, null);
+            done();
+        });
+    });
 });

@@ -75,4 +75,26 @@ describe('Resolve fragment', function() {
             };
         }), done);
     });
+
+    it('returns null if null is passed as data', function(done) {
+        resolveFragment(
+            { id: 1, participantId: 2 },
+            {
+                reference: 'participantId',
+                shape: {
+                    collectionName: 'foobar',
+                    shape: {
+                        id: 'id',
+                        name: 'name'
+                    }
+                }
+            },
+            merge({}, defaultOptions, { fetchData: mockFetchData(null) }),
+            function(err, res) {
+                assert(!err);
+                assert.equal(res.data['foobar::2'], null);
+                done();
+            }
+        );
+    });
 });
