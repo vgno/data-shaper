@@ -4,17 +4,17 @@ var async = require('async');
 var merge = require('lodash.merge');
 var resolveValue = require('./lib/resolve-value');
 var resolveFragment = require('./lib/resolve-fragment');
-var shapeResponse = require('./lib/shape-response');
+var shapeData = require('./lib/shape-data');
 
 /**
- * Restructures a response by creating entity collection arrays
- * for each collection.
+ * Restructures data by creating entity collection arrays for each
+ * collection.
  *
- * The property names in the raw response is split by :: which separates
+ * The property names in the raw data is split by :: which separates
  * the collection name and object id.
  *
- * @param {object} raw Raw response to restructure
- * @return {object} Restructured response
+ * @param {object} raw Raw data to restructure
+ * @return {object} Restructured data
  */
 function unserializeCollections(raw) {
     var res = {};
@@ -38,13 +38,13 @@ function unserializeCollections(raw) {
  * Shape an array of data object to a given shape
  *
  * @param {array} data Array of data objects
- * @param {object} shape Object describing the response shape
+ * @param {object} shape Object describing the shape
  * @param {object} options Options object with functions to use in the shaping
  * @param {object} callback
  */
 function dataShaper(data, shape, options, callback) {
     var shaperOptions = merge({
-        shapeResponse: shapeResponse,
+        shapeData: shapeData,
         resolveValue: resolveValue,
         resolveFragment: resolveFragment,
         memoize: true
@@ -64,11 +64,11 @@ function dataShaper(data, shape, options, callback) {
         data = [data];
     }
 
-    var response = {};
+    var result = {};
 
     async.each(data, function(item, cb) {
-        shaperOptions.shapeResponse(item, shape, shaperOptions, function(err, res) {
-            merge(response, res);
+        shaperOptions.shapeData(item, shape, shaperOptions, function(err, res) {
+            merge(result, res);
             cb(err);
         });
     }, function(err) {
@@ -77,7 +77,7 @@ function dataShaper(data, shape, options, callback) {
             return;
         }
 
-        callback(err, unserializeCollections(response));
+        callback(err, unserializeCollections(result));
     });
 }
 

@@ -3,7 +3,7 @@
 var assert = require('assert');
 var helpers = require('../lib/helpers');
 
-describe('Response shaper helpers', function() {
+describe('Helpers', function() {
     describe('#splitReference', function() {
         it('splits dot notated reference into parts', function(done) {
             var parts = helpers.splitReference('some.related.property');

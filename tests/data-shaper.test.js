@@ -2,7 +2,7 @@
 
 var assert = require('assert');
 var merge = require('lodash.merge');
-var responseShaper = require('../');
+var dataShaper = require('../');
 var fetchData = require('./mock/fetch-data');
 var fetchDataCounter = require('./mock/fetch-data-counter');
 
@@ -18,7 +18,7 @@ var simpleShape = {
 
 var defaultOptions = { fetchData: fetchData() };
 
-describe('Response shaper', function() {
+describe('Data shaper', function() {
     var duplicateShape = {
         collectionName: 'people',
         shape: {
@@ -36,7 +36,7 @@ describe('Response shaper', function() {
             { id: 2, firstName: 'Barney', lastName: 'Rubble', age: 32 }
         ];
 
-        responseShaper(data, simpleShape, defaultOptions, function(err, res) {
+        dataShaper(data, simpleShape, defaultOptions, function(err, res) {
             assert(!err);
             assert.deepEqual(res, {
                 persons: {
@@ -50,7 +50,7 @@ describe('Response shaper', function() {
     });
 
     it('returns an empty object if no data is given', function(done) {
-        responseShaper([], {}, defaultOptions, function(err, res) {
+        dataShaper([], {}, defaultOptions, function(err, res) {
             assert(!err);
             assert.deepEqual(res, {});
             done();
@@ -60,7 +60,7 @@ describe('Response shaper', function() {
     it('memoizes fetchData function by default', function(done) {
         var fetchCompanyData = fetchDataCounter({ postal: 'Oslo' });
 
-        responseShaper(
+        dataShaper(
             [{id: 1, name: 'Fred', zipId: 1234}],
             duplicateShape,
             { fetchData: fetchCompanyData },
@@ -76,7 +76,7 @@ describe('Response shaper', function() {
     it('allows turning off memoization', function(done) {
         var fetchCompanyData = fetchDataCounter({ postal: 'Oslo' });
 
-        responseShaper(
+        dataShaper(
             [{ id: 1, name: 'Fred', zipId: 1234 }],
             duplicateShape,
             { fetchData: fetchCompanyData, memoize: false },
@@ -91,7 +91,7 @@ describe('Response shaper', function() {
     });
 
     it('wraps non-array in array if necessary', function(done) {
-        responseShaper(
+        dataShaper(
             { id: 1, firstName: 'Fred', lastName: 'Flintstone', age: 36 },
             simpleShape,
             defaultOptions,
@@ -115,7 +115,7 @@ describe('Response shaper', function() {
             });
         }
 
-        responseShaper(
+        dataShaper(
             [{ firstName: 'Kristoffer' }],
             simpleShape,
             merge({}, defaultOptions, { resolveValue: resolveValue }),

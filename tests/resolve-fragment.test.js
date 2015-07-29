@@ -6,11 +6,11 @@ var merge = require('lodash.merge');
 
 var resolveValue = require('../lib/resolve-value');
 var resolveFragment = require('../lib/resolve-fragment');
-var shapeResponse = require('../lib/shape-response');
+var shapeData = require('../lib/shape-data');
 var mockFetchData = require('./mock/fetch-data');
 var mockError = require('./mock/error');
 
-describe('Response fragment resolver', function() {
+describe('Resolve fragment', function() {
     var personData = { id: 1, firstName: 'Fred', companyId: 2 };
     var companyData = { id: 2, name: 'VG' };
 
@@ -31,7 +31,7 @@ describe('Response fragment resolver', function() {
         fetchData: mockFetchData(companyData),
         resolveValue: resolveValue,
         resolveFragment: resolveFragment,
-        shapeResponse: shapeResponse
+        shapeData: shapeData
     };
 
     it('resolves and returns data for shape fragment', function(done) {
@@ -58,7 +58,7 @@ describe('Response fragment resolver', function() {
         var optionsArr = [
             merge({}, defaultOptions, { resolveValue: error }),
             merge({}, defaultOptions, { fetchData: error }),
-            merge({}, defaultOptions, { shapeResponse: error })
+            merge({}, defaultOptions, { shapeData: error })
         ];
 
         async.parallel(optionsArr.map(function(options) {

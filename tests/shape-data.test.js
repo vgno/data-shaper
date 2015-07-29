@@ -2,7 +2,7 @@
 
 var assert = require('assert');
 var merge = require('lodash.merge');
-var shapeResponse = require('../lib/shape-response');
+var shapeData = require('../lib/shape-data');
 var resolveValue = require('../lib/resolve-value');
 var resolveFragment = require('../lib/resolve-fragment');
 
@@ -17,7 +17,7 @@ var options = {
     },
     resolveValue: resolveValue,
     resolveFragment: resolveFragment,
-    shapeResponse: shapeResponse
+    shapeData: shapeData
 };
 
 var shape = {
@@ -38,9 +38,9 @@ var shape = {
     }
 };
 
-describe('Shape response', function() {
+describe('Shape data', function() {
     it('can shape object using a shape with fragments', function(done) {
-        shapeResponse(
+        shapeData(
             { id: 1, firstName: 'Fred', companyId: 2 },
             shape,
             options,
@@ -56,7 +56,7 @@ describe('Shape response', function() {
     });
 
     it('returns fragment resolving error through callback', function(done) {
-        shapeResponse(
+        shapeData(
             { id: 1, firstName: 'Fred', companyId: 2 },
             shape,
             merge({}, options, {
@@ -74,7 +74,7 @@ describe('Shape response', function() {
     });
 
     it('returns error if id field is missing in shape', function(done) {
-        shapeResponse([], {
+        shapeData([], {
             collectionName: 'friends',
             shape: {
                 name: 'name'

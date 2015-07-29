@@ -5,7 +5,7 @@ var resolveValue = require('../lib/resolve-value');
 var mockError = require('./mock/error');
 var fetchData = require('./mock/fetch-data');
 
-describe('Response value resolver', function() {
+describe('Resolve value', function() {
     var data = { id: 1, lastName: 'Flintstone', companyId: 2};
 
     it('takes local values off the data object', function(done) {
@@ -16,7 +16,7 @@ describe('Response value resolver', function() {
         });
     });
 
-    it('resolve dot notated references', function(done) {
+    it('resolves dot notated references', function(done) {
         var companyData = { id: 2, name: 'VG' };
 
         resolveValue(
