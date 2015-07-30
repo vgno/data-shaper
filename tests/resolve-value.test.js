@@ -6,10 +6,9 @@ var merge = require('lodash.merge');
 
 var resolveValue = require('../lib/resolve-value');
 var mockError = require('./mock/error');
-var fetchData = require('./mock/fetch-data');
 
 var defaultOptions = {
-    resolveValue: resolveValue,
+    resolveValue: resolveValue
 };
 
 describe('Resolve value', function() {
@@ -26,13 +25,13 @@ describe('Resolve value', function() {
     it('resolves dot notated references', function(done) {
         var customData = {
             companyId: { '2': { id: 2, name: 'VG', municipalId: 1 } },
-            municipalId: { '1' : { id: 1, name: 'Oslo', countryId: 4 }},
-            countryId: { '4' : { id: 4, name: 'Norway' }}
+            municipalId: { '1': { id: 1, name: 'Oslo', countryId: 4 }},
+            countryId: { '4': { id: 4, name: 'Norway' }}
         };
 
         // Data fetcher that responds to id and reference params and returns
         // mock data for a few different collections
-        var customFetchData = function(id, reference, callback) {
+        function customFetchData(id, reference, callback) {
             process.nextTick(function() {
                 callback(null, customData[reference][String(id)]);
             });
