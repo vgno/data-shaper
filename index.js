@@ -2,6 +2,8 @@
 
 var async = require('async');
 var merge = require('lodash.merge');
+
+var hashFetchDataCall = require('./lib/helpers').hashFetchDataCall;
 var resolveValue = require('./lib/resolve-value');
 var resolveFragment = require('./lib/resolve-fragment');
 var shapeData = require('./lib/shape-data');
@@ -57,7 +59,7 @@ function dataShaper(data, shape, options, callback) {
 
     // Memoize data fetching to speed things up
     if (shaperOptions.memoize) {
-        shaperOptions.fetchData = async.memoize(shaperOptions.fetchData);
+        shaperOptions.fetchData = async.memoize(shaperOptions.fetchData, hashFetchDataCall);
     }
 
     if (!Array.isArray(data)) {

@@ -33,4 +33,14 @@ describe('Helpers', function() {
             done();
         });
     });
+
+    describe('#hashFetchDataCall', function() {
+        it('disregards the callback parameter when hashing', function(done) {
+            var hash1 = helpers.hashFetchDataCall(1337, 'foobarId', function foo() {});
+            var hash2 = helpers.hashFetchDataCall(1337, 'foobarId', function bar() {});
+
+            assert.strictEqual(hash1, hash2);
+            done();
+        });
+    });
 });
