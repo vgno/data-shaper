@@ -61,7 +61,7 @@ describe('Data shaper', function() {
         var fetchCompanyData = fetchDataCounter({ postal: 'Oslo' });
 
         dataShaper(
-            [{id: 1, name: 'Fred', zipId: 1234}],
+            [{ id: 1, name: 'Fred', zipId: 1234 }],
             duplicateShape,
             { fetchData: fetchCompanyData },
             function() {

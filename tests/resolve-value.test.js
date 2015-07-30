@@ -24,15 +24,27 @@ describe('Resolve value', function() {
     });
 
     it('resolves dot notated references', function(done) {
-        var companyData = { id: 2, name: 'VG' };
+        var customData = {
+            companyId: { '2': { id: 2, name: 'VG', municipalId: 1 } },
+            municipalId: { '1' : { id: 1, name: 'Oslo', countryId: 4 }},
+            countryId: { '4' : { id: 4, name: 'Norway' }}
+        };
+
+        // Data fetcher that responds to id and reference params and returns
+        // mock data for a few different collections
+        var customFetchData = function(id, reference, callback) {
+            process.nextTick(function() {
+                callback(null, customData[reference][String(id)]);
+            });
+        }
 
         resolveValue(
             data,
-            'companyId.name',
-            { fetchData: fetchData(companyData) },
-            function(err, res) {
+            'companyId.municipalId.countryId.name',
+            merge({}, defaultOptions, { fetchData: customFetchData }),
+            function(err, value) {
                 assert(!err);
-                assert.equal(res, companyData.name);
+                assert.equal(value, customData.countryId['4'].name);
                 done();
             }
         );
