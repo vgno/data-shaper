@@ -1,15 +1,22 @@
 'use strict';
 
 var assert = require('assert');
+
+var merge = require('lodash.merge');
+
 var resolveValue = require('../lib/resolve-value');
 var mockError = require('./mock/error');
 var fetchData = require('./mock/fetch-data');
+
+var defaultOptions = {
+    resolveValue: resolveValue,
+};
 
 describe('Resolve value', function() {
     var data = { id: 1, lastName: 'Flintstone', companyId: 2};
 
     it('takes local values off the data object', function(done) {
-        resolveValue(data, 'lastName', {}, function(err, res) {
+        resolveValue(data, 'lastName', defaultOptions, function(err, res) {
             assert(!err);
             assert.equal(res, data.lastName);
             done();
@@ -37,7 +44,7 @@ describe('Resolve value', function() {
         resolveValue(
             data,
             'companyId.name',
-            { fetchData: mockError(errorText) },
+            merge({}, defaultOptions, { fetchData: mockError(errorText) }),
             function(err) {
                 assert.equal(err, errorText);
                 done();
@@ -46,7 +53,7 @@ describe('Resolve value', function() {
     });
 
     it('returns null if null is passed as data', function(done) {
-        resolveValue(null, 'foobar', {}, function(err, res) {
+        resolveValue(null, 'foobar', defaultOptions, function(err, res) {
             assert(!err);
             assert.equal(res, null);
             done();
