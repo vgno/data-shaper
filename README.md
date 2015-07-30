@@ -27,8 +27,11 @@ function fetchData(id, reference, callback) {
 }
 
 var companyShape = {
-    id: 'id',
-    name: 'name'
+    collectionName: 'companies',
+    shape: {
+        id: 'id',
+        name: 'name'
+    }
 };
 
 var personShape = {
@@ -54,8 +57,8 @@ The value of res in the callback is:
 
 ```js
 {
-    persons: { '1' : { id: 1, name: 'Kristoffer', employer: { employers: 1 } } },
-    employers: { '2' : { id: 2, name: 'VG' } }
+    persons: { '1' : { id: 1, name: 'Kristoffer', company: { companies: 2 } } },
+    companies: { '2' : { id: 2, name: 'VG' } }
 }
 ```
 
