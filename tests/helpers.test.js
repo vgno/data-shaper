@@ -43,4 +43,46 @@ describe('Helpers', function() {
             done();
         });
     });
+
+    describe('#getReverseReferenceData', function() {
+        it('extracts information from reverse references', function(done) {
+            assert.deepEqual(
+                helpers.getReverseReferenceData('foo(bar=id)'),
+                { collection: 'foo', referring: 'bar', referred: 'id' }
+            );
+
+            assert.deepEqual(
+                helpers.getReverseReferenceData('fooCollection(myField=someOtherField)'),
+                { collection: 'fooCollection', referring: 'myField', referred: 'someOtherField' }
+            );
+
+            assert.deepEqual(
+                helpers.getReverseReferenceData('foo-collection(my-field=some-field)'),
+                { collection: 'foo-collection', referring: 'my-field', referred: 'some-field' }
+            );
+
+            assert.deepEqual(
+                helpers.getReverseReferenceData('foo_collection(my_field=some_field)'),
+                { collection: 'foo_collection', referring: 'my_field', referred: 'some_field' }
+            );
+
+            done();
+        });
+
+        it('returns null if reverse reference is not valid', function(done) {
+            var invalidRefs = [
+                '.foo(bar=id).', '.foo(bar=id)', 'foo(bar=id).',
+                'sfd(bar)', 'sfd(bar:id)', 'sfd(bar=id',
+                'sfd(bar)', 'sfd(bar))', 'sfd'
+            ];
+
+            for (var i in invalidRefs) {
+                var ref = invalidRefs[i];
+
+                assert.equal(helpers.getReverseReferenceData(ref), null);
+            }
+
+            done();
+        });
+    });
 });

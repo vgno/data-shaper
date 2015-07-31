@@ -49,6 +49,93 @@ describe('Data shaper', function() {
         });
     });
 
+    it('can shape object with reverse reference', function(done) {
+        var data = {
+            persons: {
+                '1': { id: 1, name: 'Fred' },
+                '2': { id: 2, name: 'Barney' }
+            },
+            addresses: {
+                '1': {
+                    id: 1, personId: 1,
+                    address: 'Alphabet st. 1',
+                    zipId: 1234,
+                    country: 1
+                },
+                '2': {
+                    id: 2,
+                    personId: 1,
+                    address: 'Number rd. 2',
+                    zipId: 1234,
+                    country: 1
+                }
+            },
+            countries: {
+                '1': { id: 1, name: 'Norway' }
+            },
+            zips: {
+                '1234': { id: 1234, countryId: 1 }
+            }
+        };
+
+        var customDataFetcher = fetchData(data);
+
+        var shape = {
+            collectionName: 'persons',
+            shape: {
+                id: 'id',
+                name: 'name',
+                addresses: {
+                    reference: 'addresses(personId=id)',
+                    shape: {
+                        collectionName: 'addresses',
+                        shape: {
+                            id: 'id',
+                            address: 'address',
+                            zip: 'zipId',
+                            country: 'zipId.countryId.name'
+                        }
+                    }
+                }
+            }
+        };
+
+        dataShaper(
+            data.persons['1'],
+            shape,
+            merge({}, defaultOptions, { fetchData: customDataFetcher }),
+            function(err, res) {
+                assert(!err);
+
+                assert.deepEqual(res, {
+                    addresses: {
+                        '1': {
+                            id: 1,
+                            address: 'Alphabet st. 1',
+                            zip: 1234,
+                            country: 'Norway'
+                        },
+                        '2': {
+                            id: 2,
+                            address: 'Number rd. 2',
+                            zip: 1234,
+                            country: 'Norway'
+                        }
+                    },
+                    persons: {
+                        '1': {
+                            id: 1,
+                            name: 'Fred',
+                            addresses: { addresses: [1, 2] }
+                        }
+                    }
+                });
+
+                done();
+            }
+        );
+    });
+
     it('returns an empty object if no data is given', function(done) {
         dataShaper([], {}, defaultOptions, function(err, res) {
             assert(!err);
