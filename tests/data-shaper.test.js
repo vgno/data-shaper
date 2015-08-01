@@ -3,7 +3,9 @@
 var assert = require('assert');
 var merge = require('lodash.merge');
 var dataShaper = require('../');
-var fetchData = require('./mock/fetch-data');
+var data = require('./mock/data');
+var mockError = require('./mock/error');
+var fetchData = require('./mock/fetch-data')(data);
 var fetchDataCounter = require('./mock/fetch-data-counter');
 
 var simpleShape = {
@@ -16,14 +18,14 @@ var simpleShape = {
     }
 };
 
-var defaultOptions = { fetchData: fetchData() };
+var defaultOptions = { fetchData: fetchData };
 
 describe('Data shaper', function() {
     var duplicateShape = {
         collectionName: 'people',
         shape: {
             id: 'id',
-            name: 'name',
+            name: 'firstName',
             zip: 'zipId',
             postal: 'zipId.postal',
             postalDupe: 'zipId.postal'
@@ -31,12 +33,9 @@ describe('Data shaper', function() {
     };
 
     it('can shape array of data objects', function(done) {
-        var data = [
-            { id: 1, firstName: 'Fred', lastName: 'Flintstone', age: 36 },
-            { id: 2, firstName: 'Barney', lastName: 'Rubble', age: 32 }
-        ];
+        var shapeData = [data.persons['1'], data.persons['2']];
 
-        dataShaper(data, simpleShape, defaultOptions, function(err, res) {
+        dataShaper(shapeData, simpleShape, defaultOptions, function(err, res) {
             assert(!err);
             assert.deepEqual(res, {
                 persons: {
@@ -50,41 +49,11 @@ describe('Data shaper', function() {
     });
 
     it('can shape object with reverse reference', function(done) {
-        var data = {
-            persons: {
-                '1': { id: 1, name: 'Fred' },
-                '2': { id: 2, name: 'Barney' }
-            },
-            addresses: {
-                '1': {
-                    id: 1, personId: 1,
-                    address: 'Alphabet st. 1',
-                    zipId: 1234,
-                    country: 1
-                },
-                '2': {
-                    id: 2,
-                    personId: 1,
-                    address: 'Number rd. 2',
-                    zipId: 1234,
-                    country: 1
-                }
-            },
-            countries: {
-                '1': { id: 1, name: 'Norway' }
-            },
-            zips: {
-                '1234': { id: 1234, countryId: 1 }
-            }
-        };
-
-        var customDataFetcher = fetchData(data);
-
         var shape = {
             collectionName: 'persons',
             shape: {
                 id: 'id',
-                name: 'name',
+                name: 'firstName',
                 addresses: {
                     reference: 'addresses(personId=id)',
                     shape: {
@@ -103,7 +72,7 @@ describe('Data shaper', function() {
         dataShaper(
             data.persons['1'],
             shape,
-            merge({}, defaultOptions, { fetchData: customDataFetcher }),
+            defaultOptions,
             function(err, res) {
                 assert(!err);
 
@@ -179,7 +148,7 @@ describe('Data shaper', function() {
 
     it('wraps non-array in array if necessary', function(done) {
         dataShaper(
-            { id: 1, firstName: 'Fred', lastName: 'Flintstone', age: 36 },
+            data.persons['1'],
             simpleShape,
             defaultOptions,
             function(err, res) {
@@ -196,16 +165,12 @@ describe('Data shaper', function() {
     it('shaping error is returned through callback', function(done) {
         var errorText = 'Something bad happened';
 
-        function resolveValue(data, reference, options, callback) {
-            process.nextTick(function() {
-                callback(errorText);
-            });
-        }
+        var resolveFailure = mockError(errorText);
 
         dataShaper(
             [{ firstName: 'Kristoffer' }],
             simpleShape,
-            merge({}, defaultOptions, { resolveValue: resolveValue }),
+            merge({}, defaultOptions, { resolveValue: resolveFailure }),
             function(err) {
                 assert.equal(err, errorText);
                 done();

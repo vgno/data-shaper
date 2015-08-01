@@ -1,20 +1,17 @@
 'use strict';
 
 var assert = require('assert');
+
 var merge = require('lodash.merge');
+
 var shapeData = require('../lib/shape-data');
 var resolveValue = require('../lib/resolve-value');
 var resolveFragment = require('../lib/resolve-fragment');
+var data = require('./mock/data');
+var fetchData = require('./mock/fetch-data')(data);
 
 var options = {
-    fetchData: function(id, ref, callback) {
-        process.nextTick(function() {
-            callback(null, {
-                id: 2,
-                name: 'VG'
-            });
-        });
-    },
+    fetchData: fetchData,
     resolveValue: resolveValue,
     resolveFragment: resolveFragment,
     shapeData: shapeData
@@ -41,7 +38,7 @@ var shape = {
 describe('Shape data', function() {
     it('can shape object using a shape with fragments', function(done) {
         shapeData(
-            { id: 1, firstName: 'Fred', companyId: 2 },
+            data.persons['1'],
             shape,
             options,
             function(err, res) {
@@ -60,7 +57,7 @@ describe('Shape data', function() {
             { id: 1, firstName: 'Fred', companyId: 2 },
             shape,
             merge({}, options, {
-                resolveFragment: function(data, ref, opts, callback) {
+                resolveFragment: function(sourceData, ref, opts, callback) {
                     process.nextTick(function() {
                         callback('Strange error');
                     });
