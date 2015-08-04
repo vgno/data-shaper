@@ -84,14 +84,14 @@ This will result in an array of all matches being returned in the shape.
 
 In some cases, you might have a single, direct reverse reference. For instance, assume you have the following collection structure (imagine the `catBreedId` can only contain unique values):
 
-## catBreeds
+### catBreeds
 
 | id | name                 | description              |
 |----|----------------------|--------------------------|
 | 1  | Norwegian Forest Cat | the most awesome of cats |
 | 2  | Scottish fold        | the cutest of cats       |
 
-## translations
+### translations
 
 | id | catBreedId | translatedName  |
 |----|------------|-----------------|
