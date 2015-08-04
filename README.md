@@ -78,6 +78,50 @@ It looks like this; `collectionName(collectionField=referencedField)` and when t
 2. Find the value to use when looking up data in the collection by fetching the value of `referencedField` from the object where the reference is
 3. Pass the collection, referring field and referenced value to the `fetchData` function
 
+This will result in an array of all matches being returned in the shape.
+
+## Single, direct, reverse reference
+
+In some cases, you might have a single, direct reverse reference. For instance, assume you have the following collection structure (imagine the `catBreedId` can only contain unique values):
+
+## catBreeds
+
+| id | name                 | description              |
+|----|----------------------|--------------------------|
+| 1  | Norwegian Forest Cat | the most awesome of cats |
+| 2  | Scottish fold        | the cutest of cats       |
+
+## translations
+
+| id | catBreedId | translatedName  |
+|----|------------|-----------------|
+| 11 | 1          | Norsk skogkatt  |
+| 12 | 2          | Skotsk kattepus |
+
+Should you want to retrieve the translation for a given `catBreed`, you can do so by specifying a reverse, direct reference. It uses the same syntax as defined above, except it uses a double equation sign (`==`). For instance, the shape could be represented as:
+
+```js
+{
+    collectionName: 'catBreeds',
+    shape: {
+        id: 'id',
+        name: 'name',
+        translated: {
+            reference: 'translations(catBreedId==id)',
+            shape: {
+                collectionName: 'translations',
+                shape: {
+                    id: 'id',
+                    translatedName: 'translatedName'
+                }
+            }
+        }
+    }
+}
+```
+
+The difference here is that the shape will return a single ID for the reference, in the same way as regular references are shaped.
+
 ## Fetching data
 In order for the data shaper to be able to resolve data you need to name your foreign keys in a way so that you're able to know what to query. The resolver pass the id and reference to the `fetchData` function you provide to the data-shaper. You will then have to use the reference to determine where the data is to be fetched from, get the data and return it.
 
