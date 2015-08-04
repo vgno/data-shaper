@@ -48,22 +48,27 @@ describe('Helpers', function() {
         it('extracts information from reverse references', function(done) {
             assert.deepEqual(
                 helpers.getReverseReferenceData('foo(bar=id)'),
-                { collection: 'foo', referring: 'bar', referred: 'id' }
+                { collection: 'foo', referring: 'bar', referred: 'id', oneToMany: true }
             );
 
             assert.deepEqual(
                 helpers.getReverseReferenceData('fooCollection(myField=someOtherField)'),
-                { collection: 'fooCollection', referring: 'myField', referred: 'someOtherField' }
+                { collection: 'fooCollection', referring: 'myField', referred: 'someOtherField', oneToMany: true }
             );
 
             assert.deepEqual(
                 helpers.getReverseReferenceData('foo-collection(my-field=some-field)'),
-                { collection: 'foo-collection', referring: 'my-field', referred: 'some-field' }
+                { collection: 'foo-collection', referring: 'my-field', referred: 'some-field', oneToMany: true }
+            );
+
+            assert.deepEqual(
+                helpers.getReverseReferenceData('foo-collection(my-field==some-field)'),
+                { collection: 'foo-collection', referring: 'my-field', referred: 'some-field', oneToMany: false }
             );
 
             assert.deepEqual(
                 helpers.getReverseReferenceData('foo_collection(my_field=some_field)'),
-                { collection: 'foo_collection', referring: 'my_field', referred: 'some_field' }
+                { collection: 'foo_collection', referring: 'my_field', referred: 'some_field', oneToMany: true }
             );
 
             done();
@@ -83,6 +88,26 @@ describe('Helpers', function() {
             }
 
             done();
+        });
+    });
+
+    describe('#isOneToMany', function() {
+        it('returns correct value for reference definitions', function() {
+            assert.equal(helpers.isOneToMany('foo(bar=id)'), true);
+            assert.equal(helpers.isOneToMany('fooCollection(myField=someOtherField)'), true);
+            assert.equal(helpers.isOneToMany('foo-collection(my-field=some-field)'), true);
+            assert.equal(helpers.isOneToMany('foo-collection(my-field==some-field)'), false);
+            assert.equal(helpers.isOneToMany('foo_collection(my_field=some_field)'), true);
+        });
+
+        it('supports nested object reference', function() {
+            assert.equal(helpers.isOneToMany({
+                reference: 'foo-collection(my-field=some-field)'
+            }), true);
+
+            assert.equal(helpers.isOneToMany({
+                reference: 'foo-collection(my-field==some-field)'
+            }), false);
         });
     });
 });
