@@ -69,6 +69,15 @@ References to values on the passed objects themselves is written as a simple str
 
 If have a field `companyId` on the object and want to get the name of the company you can use `companyId.name` given that name is a property on the company data object.
 
+## Reverse references
+In some cases data is referred to using coupling tables in order to make it possible to represent one-to-many or many-to-many relationships. The data shaper lets you express these relations using a reverse reference lookup.
+
+It looks like this; `collectionName(collectionField=referencedField)` and when the resolver finds a reference like this it does the following:
+
+1. Extracts the data from the reference: collection name, referring and referenced field
+2. Find the value to use when looking up data in the collection by fetching the value of `referencedField` from the object where the reference is
+3. Pass the collection, referring field and referenced value to the `fetchData` function
+
 ## Fetching data
 In order for the data shaper to be able to resolve data you need to name your foreign keys in a way so that you're able to know what to query. The resolver pass the id and reference to the `fetchData` function you provide to the data-shaper. You will then have to use the reference to determine where the data is to be fetched from, get the data and return it.
 
@@ -76,9 +85,36 @@ Your fetchData function may look like this
 ```js
 var db = require('your-database-adapter');
 
-function fetchData(id, reference, callback) {
+/**
+ * Function fetching and returning data.
+ *
+ * If reference contains a simple string the data can usually be fetched by primary key,
+ * and if the value is a reverse reference the collection name and field can be parsed from the
+ * reference and the value used to filter the result set. In both cases a full object with all
+ * relevant data for the collection is expected.
+ *
+ * @param {int} Value to use when looking up data
+ * @param {string} reference One of two types; someOtherId (foreign key) or collection::fieldName (reverse reference)
+ * @param {function} callback
+ */
+function fetchData(value, reference, callback) {
+    if (reference.indexOf('::') > -1) {
+        var splitReference = reference.split('::');
+
+        db(tableName)
+            .where(splitReference, '=', value)
+            .then(function(res) {
+                callback(null, res)
+            })
+            .catch(callback);
+
+        return;
+    }
+
+    // Remove Id suffix from foreign key name to get collection name
     var tableName = reference.replace(/Id$/, '');
 
+    // Fetch the data
     db(tableName).fetch(id, callback);
 }
 ```

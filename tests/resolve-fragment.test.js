@@ -12,7 +12,7 @@ var mockError = require('./mock/error');
 
 describe('Resolve fragment', function() {
     var personData = { id: 1, firstName: 'Fred', companyId: 2 };
-    var companyData = { id: 2, name: 'VG' };
+    var companyData = { companies: { '2': { id: 2, name: 'VG' } } };
 
     var companyShape = {
         collectionName: 'companies',

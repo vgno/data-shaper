@@ -6,44 +6,33 @@ var merge = require('lodash.merge');
 
 var resolveValue = require('../lib/resolve-value');
 var mockError = require('./mock/error');
+var data = require('./mock/data');
+var fetchData = require('./mock/fetch-data')(data);
 
 var defaultOptions = {
-    resolveValue: resolveValue
+    resolveValue: resolveValue,
+    fetchData: fetchData
 };
 
 describe('Resolve value', function() {
-    var data = { id: 1, lastName: 'Flintstone', companyId: 2};
+    var personData = data.persons['1'];
 
     it('takes local values off the data object', function(done) {
-        resolveValue(data, 'lastName', defaultOptions, function(err, res) {
+        resolveValue(personData, 'lastName', defaultOptions, function(err, res) {
             assert(!err);
-            assert.equal(res, data.lastName);
+            assert.equal(res, personData.lastName);
             done();
         });
     });
 
     it('resolves dot notated references', function(done) {
-        var customData = {
-            companyId: { '2': { id: 2, name: 'VG', municipalId: 1 } },
-            municipalId: { '1': { id: 1, name: 'Oslo', countryId: 4 }},
-            countryId: { '4': { id: 4, name: 'Norway' }}
-        };
-
-        // Data fetcher that responds to id and reference params and returns
-        // mock data for a few different collections
-        function customFetchData(id, reference, callback) {
-            process.nextTick(function() {
-                callback(null, customData[reference][String(id)]);
-            });
-        }
-
         resolveValue(
-            data,
+            data.persons['1'],
             'companyId.municipalId.countryId.name',
-            merge({}, defaultOptions, { fetchData: customFetchData }),
+            defaultOptions,
             function(err, value) {
                 assert(!err);
-                assert.equal(value, customData.countryId['4'].name);
+                assert.equal(value, data.countries['1'].name);
                 done();
             }
         );
@@ -69,5 +58,18 @@ describe('Resolve value', function() {
             assert.equal(res, null);
             done();
         });
+    });
+
+    it('can resolve a one-to-many-relation', function(done) {
+        resolveValue(
+            data.persons['1'],
+            'phoneNumbers(employeeId=id).phoneTypeId.name',
+            defaultOptions,
+            function(err, res) {
+                assert(!err);
+                assert.deepEqual(res, ['Mobile', 'Landline']);
+                done();
+            }
+        );
     });
 });

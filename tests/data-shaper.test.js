@@ -3,7 +3,9 @@
 var assert = require('assert');
 var merge = require('lodash.merge');
 var dataShaper = require('../');
-var fetchData = require('./mock/fetch-data');
+var data = require('./mock/data');
+var mockError = require('./mock/error');
+var fetchData = require('./mock/fetch-data')(data);
 var fetchDataCounter = require('./mock/fetch-data-counter');
 
 var simpleShape = {
@@ -16,14 +18,14 @@ var simpleShape = {
     }
 };
 
-var defaultOptions = { fetchData: fetchData() };
+var defaultOptions = { fetchData: fetchData };
 
 describe('Data shaper', function() {
     var duplicateShape = {
         collectionName: 'people',
         shape: {
             id: 'id',
-            name: 'name',
+            name: 'firstName',
             zip: 'zipId',
             postal: 'zipId.postal',
             postalDupe: 'zipId.postal'
@@ -31,12 +33,9 @@ describe('Data shaper', function() {
     };
 
     it('can shape array of data objects', function(done) {
-        var data = [
-            { id: 1, firstName: 'Fred', lastName: 'Flintstone', age: 36 },
-            { id: 2, firstName: 'Barney', lastName: 'Rubble', age: 32 }
-        ];
+        var shapeData = [data.persons['1'], data.persons['2']];
 
-        dataShaper(data, simpleShape, defaultOptions, function(err, res) {
+        dataShaper(shapeData, simpleShape, defaultOptions, function(err, res) {
             assert(!err);
             assert.deepEqual(res, {
                 persons: {
@@ -47,6 +46,63 @@ describe('Data shaper', function() {
 
             done();
         });
+    });
+
+    it('can shape object with reverse reference', function(done) {
+        var shape = {
+            collectionName: 'persons',
+            shape: {
+                id: 'id',
+                name: 'firstName',
+                addresses: {
+                    reference: 'addresses(personId=id)',
+                    shape: {
+                        collectionName: 'addresses',
+                        shape: {
+                            id: 'id',
+                            address: 'address',
+                            zip: 'zipId',
+                            country: 'zipId.countryId.name'
+                        }
+                    }
+                }
+            }
+        };
+
+        dataShaper(
+            data.persons['1'],
+            shape,
+            defaultOptions,
+            function(err, res) {
+                assert(!err);
+
+                assert.deepEqual(res, {
+                    addresses: {
+                        '1': {
+                            id: 1,
+                            address: 'Alphabet st. 1',
+                            zip: 1234,
+                            country: 'Norway'
+                        },
+                        '2': {
+                            id: 2,
+                            address: 'Number rd. 2',
+                            zip: 1234,
+                            country: 'Norway'
+                        }
+                    },
+                    persons: {
+                        '1': {
+                            id: 1,
+                            name: 'Fred',
+                            addresses: { addresses: [1, 2] }
+                        }
+                    }
+                });
+
+                done();
+            }
+        );
     });
 
     it('returns an empty object if no data is given', function(done) {
@@ -92,7 +148,7 @@ describe('Data shaper', function() {
 
     it('wraps non-array in array if necessary', function(done) {
         dataShaper(
-            { id: 1, firstName: 'Fred', lastName: 'Flintstone', age: 36 },
+            data.persons['1'],
             simpleShape,
             defaultOptions,
             function(err, res) {
@@ -109,16 +165,12 @@ describe('Data shaper', function() {
     it('shaping error is returned through callback', function(done) {
         var errorText = 'Something bad happened';
 
-        function resolveValue(data, reference, options, callback) {
-            process.nextTick(function() {
-                callback(errorText);
-            });
-        }
+        var resolveFailure = mockError(errorText);
 
         dataShaper(
             [{ firstName: 'Kristoffer' }],
             simpleShape,
-            merge({}, defaultOptions, { resolveValue: resolveValue }),
+            merge({}, defaultOptions, { resolveValue: resolveFailure }),
             function(err) {
                 assert.equal(err, errorText);
                 done();
