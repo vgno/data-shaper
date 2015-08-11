@@ -6,9 +6,14 @@ var helpers = require('../lib/helpers');
 describe('Helpers', function() {
     describe('#splitReference', function() {
         it('splits dot notated reference into parts', function(done) {
-            var parts = helpers.splitReference('some.related.property');
+            var parts = helpers.splitReference('addresses(personId==id,address="Alphabet st. 1").zip.name');
 
-            assert.deepEqual(parts, ['some', 'related', 'property']);
+            assert.deepEqual(parts, [
+                'addresses(personId==id,address="Alphabet st. 1")',
+                'zip',
+                'name'
+            ]);
+
             done();
         });
 
@@ -48,27 +53,62 @@ describe('Helpers', function() {
         it('extracts information from reverse references', function(done) {
             assert.deepEqual(
                 helpers.getReverseReferenceData('foo(bar=id)'),
-                { collection: 'foo', referring: 'bar', referred: 'id', oneToMany: true }
+                {
+                    collection: 'foo',
+                    references: { bar: 'id' },
+                    filters: {},
+                    oneToMany: true
+                }
             );
 
             assert.deepEqual(
                 helpers.getReverseReferenceData('fooCollection(myField=someOtherField)'),
-                { collection: 'fooCollection', referring: 'myField', referred: 'someOtherField', oneToMany: true }
+                {
+                    collection: 'fooCollection',
+                    references: { myField: 'someOtherField' },
+                    filters: {},
+                    oneToMany: true
+                }
             );
 
             assert.deepEqual(
                 helpers.getReverseReferenceData('foo-collection(my-field=some-field)'),
-                { collection: 'foo-collection', referring: 'my-field', referred: 'some-field', oneToMany: true }
+                {
+                    collection: 'foo-collection',
+                    references: { 'my-field': 'some-field' },
+                    filters: {},
+                    oneToMany: true
+                }
             );
 
             assert.deepEqual(
                 helpers.getReverseReferenceData('foo-collection(my-field==some-field)'),
-                { collection: 'foo-collection', referring: 'my-field', referred: 'some-field', oneToMany: false }
+                {
+                    collection: 'foo-collection',
+                    references: { 'my-field': 'some-field' },
+                    filters: {},
+                    oneToMany: false
+                }
             );
 
             assert.deepEqual(
                 helpers.getReverseReferenceData('foo_collection(my_field=some_field)'),
-                { collection: 'foo_collection', referring: 'my_field', referred: 'some_field', oneToMany: true }
+                {
+                    collection: 'foo_collection',
+                    references: { 'my_field': 'some_field' },
+                    filters: {},
+                    oneToMany: true
+                }
+            );
+
+            assert.deepEqual(
+                helpers.getReverseReferenceData('foo_collection(my_field=1st-player, something="value", foo=123.435)'),
+                {
+                    collection: 'foo_collection',
+                    references: { 'my_field': '1st-player' },
+                    filters: { foo: 123, something: 'value' },
+                    oneToMany: true
+                }
             );
 
             done();
@@ -78,7 +118,8 @@ describe('Helpers', function() {
             var invalidRefs = [
                 '.foo(bar=id).', '.foo(bar=id)', 'foo(bar=id).',
                 'sfd(bar)', 'sfd(bar:id)', 'sfd(bar=id',
-                'sfd(bar)', 'sfd(bar))', 'sfd'
+                'sfd(bar)', 'sfd(bar))', 'sfd', 'sfd()',
+                'sfd(foo=bar, bar==foo)'
             ];
 
             for (var i in invalidRefs) {
@@ -108,6 +149,17 @@ describe('Helpers', function() {
             assert.equal(helpers.isOneToMany({
                 reference: 'foo-collection(my-field==some-field)'
             }), false);
+        });
+    });
+
+    describe('#buildQuery', function() {
+        it('builds query from data, references and filter', function() {
+            var data = { id: 1, firstName: 'Kristoffer', age: 26 };
+            var references = { personId: 'id' };
+            var filters = { firstName: 'Kristoffer', age: 26 };
+
+            var query = helpers.buildQuery(data, references, filters);
+            assert.deepEqual(query, { age: 26, firstName: 'Kristoffer', personId: 1 });
         });
     });
 });
