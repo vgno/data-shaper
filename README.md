@@ -122,7 +122,7 @@ Should you want to retrieve the translation for a given `catBreed`, you can do s
 
 The difference here is that the shape will return a single ID for the reference, in the same way as regular references are shaped.
 
-## Advanced reverse references
+## Complex reverse references
 Sometimes there is a need for filtering the data, for instance if the reverse lookup returns translations for multiple languages and you only need the norwegian translation. Filtering of data can be done by specifying multiple field-value pairs; ```translations(catBreedId=id, language="no-NB")```.
 
 ## Fetching data
