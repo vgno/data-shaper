@@ -122,6 +122,9 @@ Should you want to retrieve the translation for a given `catBreed`, you can do s
 
 The difference here is that the shape will return a single ID for the reference, in the same way as regular references are shaped.
 
+## Advanced reverse references
+Sometimes there is a need for filtering the data, for instance if the reverse lookup returns translations for multiple languages and you only need the norwegian translation. Filtering of data can be done by specifying multiple field-value pairs; ```translations(catBreedId=id, language="no-NB")```.
+
 ## Fetching data
 In order for the data shaper to be able to resolve data you need to name your foreign keys in a way so that you're able to know what to query. The resolver pass the id and reference to the `fetchData` function you provide to the data-shaper. You will then have to use the reference to determine where the data is to be fetched from, get the data and return it.
 
@@ -132,21 +135,25 @@ var db = require('your-database-adapter');
 /**
  * Function fetching and returning data.
  *
- * If reference contains a simple string the data can usually be fetched by primary key,
- * and if the value is a reverse reference the collection name and field can be parsed from the
- * reference and the value used to filter the result set. In both cases a full object with all
- * relevant data for the collection is expected.
+ * If value is not an object the reference is a foreign key and the data can usually be fetched
+ * by primary key on the referred table. If however the value is an object, we're doing a reverse
+ * lookup and the value contains the data to filter by.
  *
- * @param {int} Value to use when looking up data
- * @param {string} reference One of two types; someOtherId (foreign key) or collection::fieldName (reverse reference)
+ * The value looks like this when doing revers referencing: { fieldA: 'valueA', fieldB: 123 }
+ *
+ * In both cases a full object with all relevant data for the collection is expected.
+ *
+ * @param {object|int} Value to use when looking up data
+ * @param {string} reference One of two types; someOtherId (foreign key) or collection (for reverse reference)
  * @param {function} callback
  */
 function fetchData(value, reference, callback) {
-    if (reference.indexOf('::') > -1) {
-        var splitReference = reference.split('::');
+    if (typeof value === 'object') {
+        var collection = reference;
+        var query = value;
 
-        db(tableName)
-            .where(splitReference, '=', value)
+        db(collection)
+            .where(query)
             .then(function(res) {
                 callback(null, res)
             })
@@ -156,10 +163,10 @@ function fetchData(value, reference, callback) {
     }
 
     // Remove Id suffix from foreign key name to get collection name
-    var tableName = reference.replace(/Id$/, '');
+    var collection = reference.replace(/Id$/, '');
 
     // Fetch the data
-    db(tableName).fetch(id, callback);
+    db(collection).fetch(id, callback);
 }
 ```
 
