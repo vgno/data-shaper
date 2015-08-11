@@ -105,6 +105,37 @@ describe('Data shaper', function() {
         );
     });
 
+    it('can shape object with reverse reference and filter', function(done) {
+        var shape = {
+            collectionName: 'persons',
+            shape: {
+                id: 'id',
+                name: 'firstName',
+                addressId: 'addresses(personId==id, address="Alphabet st. 1").id'
+            }
+        };
+
+        dataShaper(
+            data.persons['1'],
+            shape,
+            defaultOptions,
+            function(err, res) {
+                assert(!err);
+                assert.deepEqual(res, {
+                    persons: {
+                        '1': {
+                            id: 1,
+                            name: 'Fred',
+                            addressId: 1
+                        }
+                    }
+                });
+
+                done();
+            }
+        );
+    });
+
     it('returns an empty object if no data is given', function(done) {
         dataShaper([], {}, defaultOptions, function(err, res) {
             assert(!err);

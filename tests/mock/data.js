@@ -20,21 +20,14 @@ var persons = {
 };
 
 var companies = {
-    '2': {
-        id: 2,
-        name: 'VG',
-        municipalId: 1
-    },
-    '3': {
-        id: 3,
-        name: 'VaffelNinja',
-        municipalId: 1
-    }
+    '2': { id: 2, name: 'VG', municipalId: 1 },
+    '3': { id: 3, name: 'VaffelNinja', municipalId: 1 }
 };
 
 var addresses = {
     '1': {
-        id: 1, personId: 1,
+        id: 1,
+        personId: 1,
         address: 'Alphabet st. 1',
         zipId: 1234,
         country: 1
