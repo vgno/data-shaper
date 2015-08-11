@@ -105,6 +105,50 @@ describe('Data shaper', function() {
         );
     });
 
+    it('can shape object with one-to-one reverse reference fragment', function(done) {
+        var shape = {
+            collectionName: 'persons',
+            shape: {
+                id: 'id',
+                name: 'firstName',
+                address: {
+                    reference: 'addresses(personId==id)',
+                    shape: {
+                        collectionName: 'addresses',
+                        shape: {
+                            id: 'id'
+                        }
+                    }
+                }
+            }
+        };
+
+        dataShaper(
+            data.persons['1'],
+            shape,
+            defaultOptions,
+            function(err, res) {
+                assert(!err);
+                assert.deepEqual(res, {
+                    addresses: {
+                        '1': {
+                            id: 1
+                        }
+                    },
+                    persons: {
+                        '1': {
+                            id: 1,
+                            name: 'Fred',
+                            address: { addresses: 1 }
+                        }
+                    }
+                });
+
+                done();
+            }
+        );
+    });
+
     it('can shape object with reverse reference and filter', function(done) {
         var shape = {
             collectionName: 'persons',
